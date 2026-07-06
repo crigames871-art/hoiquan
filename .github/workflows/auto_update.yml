@@ -2,19 +2,22 @@ name: Tự Động Cập Nhật Link Bóng Đá
 
 on:
   schedule:
-    # Cứ mỗi 2 tiếng hệ thống sẽ tự chạy (Tính theo giờ chuẩn UTC)
     - cron: '0 */2 * * *'
-  workflow_dispatch: # Nút bấm để bạn có thể tự kích hoạt chạy bằng tay bất cứ lúc nào
+  workflow_dispatch:
+
+# --- ĐÂY LÀ CHÌA KHÓA: Cấp quyền GHI file cho Bot ---
+permissions:
+  contents: write
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
     - name: Kiểm tra mã nguồn
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4 # Đã nâng cấp lên v4 để xóa cảnh báo vàng
 
     - name: Thiết lập Python
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5 # Đã nâng cấp lên v5
       with:
         python-version: '3.10'
 
@@ -31,5 +34,6 @@ jobs:
         git config --local user.email "actions@github.com"
         git config --local user.name "GitHub Actions"
         git add bongda.m3u
-        git commit -m "Bot tự động cập nhật danh sách trận đấu" || exit 0
+        # Nếu có link mới thì lưu, nếu y hệt cũ thì bỏ qua để không báo lỗi
+        git commit -m "Bot tự động cập nhật danh sách trận đấu" || echo "Không có trận đấu mới, bỏ qua commit"
         git push
